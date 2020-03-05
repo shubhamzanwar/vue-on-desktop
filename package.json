@@ -5,6 +5,7 @@
     "build": "webpack --env.prod"
   },
   "dependencies": {
+    "@vue/runtime-core": "3.0.0-alpha.7",
     "vue": "^3.0.0-alpha.4"
   },
   "devDependencies": {
