@@ -1,22 +1,19 @@
 const path = require('path')
 const { VueLoaderPlugin } = require('vue-loader')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 module.exports = (env = {}) => ({
   mode: env.prod ? 'production' : 'development',
   devtool: env.prod ? 'source-map' : 'cheap-module-eval-source-map',
   entry: path.resolve(__dirname, './src/main.js'),
+  target: 'node',
   output: {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/'
   },
   resolve: {
+    extensions: [".ts", ".js", ".vue", ".json"],
     alias: {
-      // this isn't technically needed, since the default `vue` entry for bundlers
-      // is a simple `export * from '@vue/runtime-dom`. However having this
-      // extra re-export somehow causes webpack to always invalidate the module
-      // on the first HMR update and causes the page to reload.
-      'vue': '@vue/runtime-dom'
+      'vue': '@vue/runtime-core'
     }
   },
   module: {
@@ -26,29 +23,17 @@ module.exports = (env = {}) => ({
         use: 'vue-loader'
       },
       {
-        test: /\.png$/,
-        use: {
-          loader: 'url-loader',
-          options: { limit: 8192 }
-        }
+        test: /\.node$/,
+        use: [{ loader: "node-loader" }, { loader: "file-loader" }]
       },
       {
-        test: /\.css$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: { hmr: !env.prod }
-          },
-          'css-loader'
-        ]
-      }
+        test: /\.(png|jpe?g|gif|svg|bmp)$/i,
+        use: [{ loader: "file-loader" }]
+      },
     ]
   },
   plugins: [
     new VueLoaderPlugin(),
-    new MiniCssExtractPlugin({
-      filename: '[name].css'
-    })
   ],
   devServer: {
     inline: true,
